@@ -5,6 +5,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In</title>
+    <style>
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+          }
+        button {
+            background-color: #3944BC;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            margin-top:10px;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+          }
+          form {
+            width: 300px; /* Adjust the width as needed */
+            margin: auto; /* Center the form horizontally */
+            display: block;
+            
+        }
+        h3{
+            text-align:Center;
+            font-size:30px;
+            font-style: italic;
+        }
+
+    </style>
 </head>
 <body>
 
@@ -21,11 +52,11 @@
     <form method="post" action="/signin" class="mb-2">
         {% csrf_token %}
         <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">Username:</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter Your Username" Required>
         </div>
         <div class="form-group">
-            <label for="pass1">Password</label>
+            <label for="pass1">Password:</label>
             <input type="password" class="form-control" id="pass1" name="pass1" placeholder="Enter Your Password" Required>
         </div>
 
