@@ -17,23 +17,22 @@ def home(request):
 
 def signup(request):
     if request.method == "POST":
-        username = request.POST['username']
         fname = request.POST['fname']
         lname = request.POST['lname']
         email = request.POST['email']
         pass1 = request.POST['pass1']
         pass2 = request.POST['pass2']
         
-        if User.objects.filter(username=username):
-            messages.error(request, "Username already exist! Please try some other username.")
+        if User.objects.filter(fname=fname):
+            messages.error(request, "ame already exist! Please try some other username.")
             return redirect('home')
         
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email Already Registered!!")
             return redirect('home')
         
-        if len(username)>20:
-            messages.error(request, "Username must be under 20 charcters!!")
+        if len(fname)>10 and len(lname)>10:
+            messages.error(request, "Name must be under 10 charcters!!")
             return redirect('home')
         
         if pass1 != pass2:
@@ -44,7 +43,7 @@ def signup(request):
             messages.error(request, "Username must be Alpha-Numeric!!")
             return redirect('home')
         
-        myuser = User.objects.create_user(username, email, pass1)
+        myuser = User.objects.create_user(fname, email, pass1)
         myuser.first_name = fname
         myuser.last_name = lname
         # myuser.is_active = False
@@ -59,10 +58,10 @@ def signup(request):
 
 def signin(request):
     if request.method == 'POST':
-        username = request.POST['username']
+        email = request.POST['email']
         pass1 = request.POST['pass1']
         
-        user = authenticate(request,username=username, password=pass1)
+        user = authenticate(request,email=email, password=pass1)
         
         if user is not None:
             login(request, user)
