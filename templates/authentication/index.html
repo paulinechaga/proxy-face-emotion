@@ -85,9 +85,10 @@
             </div>
         {% endfor %}
 
-        <h1>Welcome to EmoSense!</h1>
+        
 
         {% if user.is_authenticated %}
+        <h1>Welcome to EmoSense!</h1>
             <h3>Hello {{ fname }}!</h3>
             <h4>You're successfully logged in.</h4>
         {% endif %}

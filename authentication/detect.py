@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+import pyttsx3
 
-# Load the trained model
 model_best = load_model('face_model.h5') 
-
+engine= pyttsx3.init()
 # Classes 7 emotional states
 class_names = ['Angry', 'Disgusted', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
@@ -15,7 +15,7 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
     # Open a connection to the webcam (0 is usually the default camera)
 cap = cv2.VideoCapture(0)
 while True:
-    # Capture frame-by-frame
+    
     ret, frame = cap.read()
 
     # Convert the frame to grayscale for face detection
@@ -43,10 +43,12 @@ while True:
         # Display the emotion label on the frame
         cv2.putText(frame, f'Emotion: {emotion_label}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     0.9, (0, 0, 255), 2)
-
+        
         # Draw a rectangle around the face
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
+        #speak the emotion
+        engine.say("emotion is" + emotion_label)
+        engine.runAndWait()
     # Display the resulting frame
     cv2.imshow('Emotion Detection', frame)
 
