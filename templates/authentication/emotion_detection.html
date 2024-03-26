@@ -1,0 +1,142 @@
+<!-- emotion_detection.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+
+</head>
+<body>
+    {% if user.is_authenticated %}
+        <h1>Welcome to EmoSense!</h1>
+            <h3>Hello {{ fname }}!</h3>
+            <h6>You're successfully logged in.</h6>
+            {% endif %}
+    {% comment %} <div>
+        <img src="data:image/jpeg;base64,{{ frame }}" width="640" height="480">
+    </div> {% endcomment %}
+    <div>
+        <button id="startButton" >Start</button>
+        <video id="webcam" width="640" height="480" style="display: none;"></video>
+        <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    </div>
+    <script>
+        function updateFrame(frameData) {
+            var img = document.getElementById('webcam');
+            img.src = 'data:image/jpeg;base64,' + frameData;
+        }
+    
+        document.getElementById('startButton').addEventListener('click', function() {
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob'; // Set response type to blob to handle image data
+            xhr.open('GET', '/start_emotion_detection/', true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    var blob = this.response;
+                    var img = document.createElement('img');
+                    img.onload = function() {
+                        // Display the image on the page
+                        document.body.appendChild(img);
+                    };
+                    img.src = URL.createObjectURL(blob);
+                }
+            };
+            xhr.send();
+        });
+        
+    </script>
+    {% comment %} <script>
+        // Function to start emotion detection
+        function startEmotionDetection() {
+            // Get the webcam element
+            var webcamVideo = document.getElementById('webcam');
+            // Check if getUserMedia is available
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Prompt the user for webcam access
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        // Set the webcam stream as the source for the video element
+                        webcamVideo.srcObject = stream;
+                        webcamVideo.style.display = 'block'; // Show the video element
+                        webcamVideo.play(); // Start playing the video stream
+
+                        // Optional: You can also capture frames from the webcam here and send them to the server for emotion detection
+                    })
+                    .catch(function(err) {
+                        console.error('Error accessing webcam:', err);
+                    });
+            } else {
+                console.error('getUserMedia is not supported');
+            }
+        }
+
+        // Add event listener to the Start button
+        document.getElementById('startButton').addEventListener('click', startEmotionDetection);
+    </script> {% endcomment %}
+
+    {% comment %} <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+        var socket = new WebSocket('ws://' + window.location.host + '/ws/emotion_detection/');
+        var webcamVideo = document.getElementById('webcam');
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var startButton = document.getElementById('startButton');
+
+        // Enable the Start button once the WebSocket connection is open
+        socket.onopen = function() {
+            startButton.disabled = false;
+            startButton.addEventListener('click', startEmotion);
+        };
+
+        function startEmotion() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    webcamVideo.srcObject = stream;
+                    webcamVideo.style.display = 'block';
+                    webcamVideo.play();
+
+                    var captureFrame = function() {
+                        ctx.drawImage(webcamVideo, 0, 0, canvas.width, canvas.height);
+                        var frameData = canvas.toDataURL('image/jpeg').split(',')[1];
+
+                        socket.send(JSON.stringify({
+                            'csrf_token': csrftoken,
+                            'frame': frameData
+                        }));
+
+                        requestAnimationFrame(captureFrame);
+                    };
+
+                    requestAnimationFrame(captureFrame);
+                })
+                .catch(function(err) {
+                    console.error('Error accessing webcam:', err);
+                });
+        }
+
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            var frame = data.frame;
+            webcamVideo.src = 'data:image/jpeg;base64,' + frame;
+        };
+    </script> {% endcomment %}
+</body>
+</html>
+
